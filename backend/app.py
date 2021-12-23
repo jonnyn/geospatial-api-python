@@ -57,11 +57,18 @@ def hello_world():
   return "Hello Earth!"
 
 @app.route('/station', methods = ['GET'])
-def get_all_stations():
-  stations = Station.get_all()
-  serializer = StationSchema(many = True)
-  data = serializer.dump(stations)
-  return jsonify(data)
+def get_single_station_or_all_stations():
+  id = request.args.get("id")
+  if id is not None:
+    station = Station.get_by_id(id)
+    serializer = StationSchema()
+    data = serializer.dump(station)
+    return jsonify(data), 200
+  else:
+    stations = Station.get_all()
+    serializer = StationSchema(many = True)
+    data = serializer.dump(stations)
+    return jsonify(data), 200
 
 @app.route('/station', methods = ['POST'])
 def create_a_station():
@@ -79,15 +86,9 @@ def create_a_station():
   data = serializer.dump(new_station)
   return jsonify(data), 201
 
-@app.route('/station/<int:id>', methods = ['GET'])
-def get_station(id):
-  station = Station.get_by_id(id)
-  serializer = StationSchema()
-  data = serializer.dump(station)
-  return jsonify(data), 200
-
-@app.route('/station/<int:id>', methods = ['PUT'])
-def update_station(id):
+@app.route('/station', methods = ['PUT'])
+def update_station():
+  id = request.args.get("id")
   updating_station = Station.get_by_id(id)
   data = request.get_json()
   updating_station.latitude = data.get('latitude'),
@@ -101,19 +102,24 @@ def update_station(id):
   data = serializer.dump(updating_station)
   return jsonify(data), 200
 
-@app.route('/station/<int:id>', methods = ['DELETE'])
-def delete_station(id):
+@app.route('/station', methods = ['DELETE'])
+def delete_station():
+  id = request.args.get("id")
   deleting_station = Station.get_by_id(id)
   deleting_station.delete()
   return jsonify({"message": "Deleted"}), 204
 
 @app.errorhandler(404)
 def not_found(error):
-  return jsonify({"message": "404: Resource not found"}), 404
+  return jsonify({"message": "404: Resource not found."}), 404
+
+@app.errorhandler(405)
+def internal_server(error):
+  return jsonify({"message": "405: The method is not allowed for the requested URL."}), 405
 
 @app.errorhandler(500)
 def internal_server(error):
-  return jsonify({"message": "500: There is internal server issue"}), 500
+  return jsonify({"message": "500: There is internal server issue."}), 500
 
 if __name__ == '__main__':
   app.run(debug = True, host = "localhost", port = 8080)
