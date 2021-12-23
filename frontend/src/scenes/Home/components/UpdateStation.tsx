@@ -30,7 +30,6 @@ const UpdateStation = ({ updateId }: { updateId: number | undefined }) => {
     id: 0,
     address: "",
     provider: "",
-    geometry: { x: 0, y: 0 },
     latitude: 0,
     longitude: 0,
     quantity: 0,
@@ -46,12 +45,7 @@ const UpdateStation = ({ updateId }: { updateId: number | undefined }) => {
       refetchOnWindowFocus: false,
       enabled: false,
       onSuccess: (data) => {
-        const station = {
-          ...data,
-          latitude: data.geometry?.x,
-          longitude: data.geometry?.y,
-        };
-        setPendingStation(station);
+        setPendingStation(data);
       },
       onError: (error) => {
         console.log(`error`, error);

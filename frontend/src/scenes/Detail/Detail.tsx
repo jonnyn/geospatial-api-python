@@ -54,7 +54,7 @@ const Detail = () => {
         Station Geometry
       </GridItem>
       <GridItem colSpan={4} px={3}>
-        {`[${station.geometry?.x}, ${station.geometry?.y}]`}
+        {`[${station.latitude}, ${station.longitude}]`}
       </GridItem>
       <GridItem colSpan={2} px={3}>
         Station Provider

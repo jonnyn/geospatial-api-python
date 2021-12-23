@@ -1,9 +1,5 @@
 interface IStation {
   id?: number;
-  geometry?: {
-    x: number;
-    y: number;
-  };
   latitude?: number;
   longitude?: number;
   address?: string;
