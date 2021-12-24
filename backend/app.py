@@ -9,10 +9,11 @@ from marshmallow import Schema, fields
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
+# app.config.from_object("config.Config")
 app.config["CORS_HEADERS"] = "Content-Type"
 app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = "postgresql://postgres:password@localhost/stations"
+] = "postgresql://postgres:8YY7mwmU905NAJ8oGHJK@database-1.cznvnak7l6zj.us-west-2.rds.amazonaws.com:5432/stations"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -144,4 +145,4 @@ def internal_server(error):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="localhost", port=8080)
+    app.run(debug=True, host="0.0.0.0")

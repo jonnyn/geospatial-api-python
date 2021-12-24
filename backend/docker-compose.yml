@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  station-api:
+    build: .
+    command: python3 app.py
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/station-flask
+
