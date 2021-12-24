@@ -22,6 +22,7 @@ Geospatial Rest API. Using Flask, Marshmallow and PostgreSQL.
 4. From Terminal, run `python3`
 5. Then `from app import Station,db`
 6. And `db.create_all()`
+7. `quit()`
 
 ## Frontend App
 

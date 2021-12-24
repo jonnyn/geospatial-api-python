@@ -1,5 +1,5 @@
 const url = "http://localhost";
-const port = 8080;
+const port = 5000;
 
 export const apiEndpoints = {
   base: `${url}:${port}`,

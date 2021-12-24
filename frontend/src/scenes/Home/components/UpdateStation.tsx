@@ -120,7 +120,7 @@ const UpdateStation = ({ updateId }: { updateId: number | undefined }) => {
               <InputGroup size="md">
                 <InputLeftAddon w="30%" children="Quantity" />
                 <Input
-                  placeholder="Quantity on hand"
+                  placeholder="# Charging spots"
                   value={pendingStation.quantity}
                   onChange={(x) => handleChange("quantity", x.target.value)}
                 />

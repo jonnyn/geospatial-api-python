@@ -104,7 +104,7 @@ const AddStation = () => {
               <InputGroup size="md">
                 <InputLeftAddon w="30%" children="Quantity" />
                 <Input
-                  placeholder="Quantity on hand"
+                  placeholder="# Charging spots"
                   value={newStation.quantity}
                   onChange={(x) => handleChange("quantity", x.target.value)}
                 />
