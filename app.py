@@ -1,4 +1,7 @@
 from flask import Flask, jsonify, request
+from apispec import APISpec
+from apispec.ext.marshmallow import MarshmallowPlugin
+from apispec_webframeworks.flask import FlaskPlugin
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -61,13 +64,55 @@ class StationSchema(Schema):
     createdAt = fields.DateTime()
 
 
-@app.route("/")
-def hello_world():
-    return "Hello Earth!"
+class StationUpdateSchema(Schema):
+    latitude = fields.Float()
+    longitude = fields.Float()
+    address = fields.String()
+    provider = fields.String()
+    quantity = fields.Integer()
+    availability = fields.Boolean()
+
+
+class StationListSchema(Schema):
+    station_list = fields.List(fields.Nested(StationSchema))
+
+
+spec = APISpec(
+    title="flask-api-swagger-doc",
+    version="1.0.0",
+    openapi_version="3.0.2",
+    plugins=[FlaskPlugin(), MarshmallowPlugin()],
+)
+
+
+@app.route("/api/swagger.json")
+def create_swagger_spec():
+    return jsonify(spec.to_dict())
 
 
 @app.route("/station", methods=["GET"])
 def get_single_station_or_all_stations():
+    """Get list of Stations or a station detail
+    ---
+    get:
+      summary: Get List of Stations. If id is specified, get a single station and its detail
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          required: false
+          description: Numeric ID of the station to get
+      responses:
+        '200':
+          description: Return a station list or a single station
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - StationListSchema
+                - StationSchema
+    """
     id = request.args.get("id")
     if id is not None:
         station = Station.get_by_id(id)
@@ -83,6 +128,23 @@ def get_single_station_or_all_stations():
 
 @app.route("/station", methods=["POST"])
 def create_a_station():
+    """Add a new station
+    ---
+    post:
+      summary: Add a new EV charging station
+      requestBody:
+        description: All *required variables*
+        required: true
+        content:
+          application/json:
+            schema: StationUpdateSchema
+      responses:
+        '201':
+          description: Return the new station
+          content:
+            application/json:
+              schema: StationSchema
+    """
     data = request.get_json()
     new_station = Station(
         latitude=data.get("latitude"),
@@ -102,6 +164,30 @@ def create_a_station():
 
 @app.route("/station", methods=["PUT"])
 def update_station():
+    """Update existing station
+    ---
+    put:
+      summary: Update an existing station
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the station to get
+      requestBody:
+        description: All *required variables*
+        required: true
+        content:
+          application/json:
+            schema: StationUpdateSchema
+      responses:
+        '200':
+          description: Return the station with new updated info
+          content:
+            application/json:
+              schema: StationSchema
+    """
     id = request.args.get("id")
     updating_station = Station.get_by_id(id)
     data = request.get_json()
@@ -119,6 +205,21 @@ def update_station():
 
 @app.route("/station", methods=["DELETE"])
 def delete_station():
+    """Delete a station
+    ---
+    delete:
+      summary: Delete an EV charging station
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the station to get
+      responses:
+        '204':
+          description: Deleted
+    """
     id = request.args.get("id")
     deleting_station = Station.get_by_id(id)
     deleting_station.delete()
@@ -141,6 +242,13 @@ def internal_server(error):
 @app.errorhandler(500)
 def internal_server(error):
     return jsonify({"message": "500: There is internal server issue."}), 500
+
+
+with app.test_request_context():
+    spec.path(view=get_single_station_or_all_stations)
+    spec.path(view=create_a_station)
+    spec.path(view=update_station)
+    spec.path(view=delete_station)
 
 
 if __name__ == "__main__":
