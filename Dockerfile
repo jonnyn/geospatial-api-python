@@ -3,8 +3,8 @@
 FROM python:3.9.9-bullseye
 
 # set work directory
-ADD . /station-flask
-WORKDIR /station-flask
+ADD . /station-api
+WORKDIR /station-api
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
