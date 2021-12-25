@@ -1,8 +1,19 @@
 version: 0.2
 phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --region us-west-2 --no-include-email)
+      - REPOSITORY_URI=$ECR_IMAGE_URL
   build:
     commands:
-      - aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_ENDPOINT
-      - docker build -t builtimage .
-      - docker tag builtimage:latest $ECR_IMAGE_URL:latest
-      - docker push $ECR_IMAGE_URL:latest
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker-compose build station-api
+      - docker tag src_station-api:latest $REPOSITORY_URI:latest
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
